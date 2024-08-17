@@ -60,18 +60,16 @@ public class RuleEngine {
 
 
             boolean isGameOver = true;
-            for (int r = 0; r < 3; r++) {
-                for (int c = 1; c < 3; c++) {
+            for (int r = 0; r < 3 && isGameOver; r++) {
+                for (int c = 0; c < 3; c++) {
                     if (gameBoard.getCell(r, c) == null) {
                         isGameOver = false;
                         break;
                     }
                 }
-                if (!isGameOver)
-                    break;
             }
             if (isGameOver)
-                return new GameResult(true, firstCharacter);
+                return new GameResult(true, "-");
         }
         return new GameResult(false, "-");
     }

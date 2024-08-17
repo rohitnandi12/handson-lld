@@ -13,6 +13,10 @@ public class GameResult {
         return isOver;
     }
 
+    public String getWinner() {
+        return winner;
+    }
+
     @Override
     public String toString() {
         return "GameResult{" +
