@@ -3,22 +3,80 @@ package case_studies.interviewready.ai_game_engine.api;
 import case_studies.interviewready.ai_game_engine.boards.TicTacToeBoard;
 import case_studies.interviewready.ai_game_engine.game.*;
 
+import java.util.Arrays;
+
 public class AIEngine {
 
-    public Move suggestMove(Player player, Board board) {
-        if (board instanceof TicTacToeBoard) {
-            TicTacToeBoard gameBoard = (TicTacToeBoard) board;
+    RuleEngine ruleEngine = new RuleEngine();
 
-            for (int r = 0; r < 3; r++) {
-                for (int c = 0; c < 3; c++) {
-                    if (gameBoard.getCell(r, c) == null) {
-                        return new Move(player, new Cell(r, c));
-                    }
-                }
+    public Move suggestMove(Player player, Board board) {
+        if (board instanceof TicTacToeBoard ticTacToeBoard) {
+            Move suggestedMove;
+            if (isStarting(ticTacToeBoard, 4)) {
+                suggestedMove = getBasicMove(player, ticTacToeBoard);
+            } else {
+                suggestedMove = getSmartMove(player, ticTacToeBoard);
             }
+
+            if (suggestedMove != null)
+                return suggestedMove;
+
             throw new IllegalStateException();
         } else {
             throw new IllegalArgumentException();
         }
+    }
+
+    public Move getSmartMove(Player player, TicTacToeBoard board) {
+        for (int r = 0; r < 3; r++) {
+            for (int c = 0; c < 3; c++) {
+                if (board.getSymbol(r, c) == null) {
+                    Move move = new Move(player, new Cell(r, c));
+                    board.move(move);
+                    if (ruleEngine.getState(board).isOver()) {
+                        return move;
+                    }
+                }
+            }
+        }
+
+        // Defensive Moves
+        for (int r = 0; r < 3; r++) {
+            for (int c = 0; c < 3; c++) {
+                if (board.getSymbol(r, c) == null) {
+                    Move move = new Move(player.flip(), new Cell(r, c));
+                    board.move(move);
+                    if (ruleEngine.getState(board).isOver()) {
+                        return new Move(player, new Cell(r, c));
+                    }
+                }
+            }
+        }
+
+        return getBasicMove(player, board);
+    }
+
+    public Move getBasicMove(Player player, TicTacToeBoard board) {
+        for (int r = 0; r < 3; r++) {
+            for (int c = 0; c < 3; c++) {
+                if (board.getCell(r, c) == null) {
+                    return new Move(player, new Cell(r, c));
+                }
+            }
+        }
+
+        throw new IllegalArgumentException();
+    }
+
+    public boolean isStarting(TicTacToeBoard board, int threshold) {
+        int count = 0;
+        for (int r = 0; r < 3; r++) {
+            for (int c = 0; c < 3; c++) {
+                if (board.getCell(r, c) == null) {
+                    count++;
+                }
+            }
+        }
+        return count < threshold;
     }
 }

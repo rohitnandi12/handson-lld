@@ -7,7 +7,7 @@ import case_studies.interviewready.ai_game_engine.game.Move;
 import java.util.Arrays;
 
 public class TicTacToeBoard extends Board {
-    private String cells[][] = new String[3][3];
+    private final String[][] cells = new String[3][3];
 
     public String[][] getCells() {
         return cells;
@@ -36,5 +36,9 @@ public class TicTacToeBoard extends Board {
     @Override
     public void move(Move move) {
         setCell(move.getCell(), move.getPlayer().symbol());
+    }
+
+    public String getSymbol(int r, int c) {
+        return this.cells[r][c];
     }
 }
