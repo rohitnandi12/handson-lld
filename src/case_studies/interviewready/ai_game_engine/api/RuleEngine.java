@@ -3,6 +3,7 @@ package case_studies.interviewready.ai_game_engine.api;
 import case_studies.interviewready.ai_game_engine.boards.TicTacToeBoard;
 import case_studies.interviewready.ai_game_engine.game.Board;
 import case_studies.interviewready.ai_game_engine.game.GameState;
+import case_studies.tictactoe.Game;
 
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -11,36 +12,18 @@ public class RuleEngine {
 
     public GameState getState(Board board) {
         if (board instanceof TicTacToeBoard tttBoard) {
-            String firstCharacter = "-";
 
-            GameState rowWin = isVictory(tttBoard::getSymbol);
-            if (rowWin != null) return rowWin;
+            GameState rowWin = outerTraversal(tttBoard::getSymbol);
+            if (rowWin.isOver()) return rowWin;
 
-            GameState colWin = isVictory((i, j) -> tttBoard.getSymbol(j, i));
-            if (colWin != null) return colWin;
+            GameState colWin = outerTraversal((i, j) -> tttBoard.getSymbol(j, i));
+            if (colWin.isOver()) return colWin;
 
-            firstCharacter = tttBoard.getSymbol(0, 0);
-            boolean diagComplete = firstCharacter != null;
-            for (int r = 0; r < 3 && diagComplete; r++) {
-                if (!firstCharacter.equals(tttBoard.getSymbol(r, r))) {
-                    diagComplete = false;
-                    break;
-                }
-            }
-            if (diagComplete)
-                return new GameState(true, firstCharacter);
+            GameState diagWin = traverse(i -> tttBoard.getSymbol(i, i));
+            if (diagWin.isOver()) return diagWin;
 
-            firstCharacter = tttBoard.getSymbol(0, 2);
-            boolean revDiagComplete = firstCharacter != null;
-            for (int r = 0; r < 3 && revDiagComplete; r++) {
-                if (!firstCharacter.equals(tttBoard.getSymbol(r, 2 - r))) {
-                    revDiagComplete = false;
-                    break;
-                }
-            }
-            if (revDiagComplete)
-                return new GameState(true, firstCharacter);
-
+            GameState revDiagWin = traverse(i -> tttBoard.getSymbol(i, 2 - i));
+            if (revDiagWin.isOver()) return revDiagWin;
 
             boolean isGameOver = true;
             for (int r = 0; r < 3 && isGameOver; r++) {
@@ -51,23 +34,36 @@ public class RuleEngine {
                     }
                 }
             }
-            if (isGameOver)
-                return new GameState(true, "-");
+            if (isGameOver) return new GameState(true, "-");
         }
         return new GameState(false, "-");
     }
 
-    public GameState isVictory(BiFunction<Integer, Integer, String> next) {
+    public GameState outerTraversal(BiFunction<Integer, Integer, String> next) {
+        GameState result = new GameState(false, "-");
         for (int i = 0; i < 3; i++) {
-            boolean possibleStreak = true;
-            for (int j = 0; j < 3; j++) {
-                if (next.apply(i, j) == null || !next.apply(i, 0).equals(next.apply(i, j))) {
-                    possibleStreak = false;
-                    break;
-                }
+            final int ii = i;
+            GameState traversal = traverse(j -> next.apply(ii, j));
+            if (traversal.isOver()) {
+                result = traversal;
+                break;
             }
-            if (possibleStreak) return new GameState(true, next.apply(i, 0));
         }
-        return null;
+        return result;
+    }
+
+    private GameState traverse(Function<Integer, String> traversal) {
+        GameState result = new GameState(false, "-");
+        boolean possibleStreak = true;
+        for (int j = 0; j < 3; j++) {
+            if (traversal.apply(j) == null || !traversal.apply(0).equals(traversal.apply(j))) {
+                possibleStreak = false;
+                break;
+            }
+        }
+        if (possibleStreak) {
+            result = new GameState(true, traversal.apply(0));
+        }
+        return result;
     }
 }
