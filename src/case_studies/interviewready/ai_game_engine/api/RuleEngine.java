@@ -2,75 +2,72 @@ package case_studies.interviewready.ai_game_engine.api;
 
 import case_studies.interviewready.ai_game_engine.boards.TicTacToeBoard;
 import case_studies.interviewready.ai_game_engine.game.Board;
-import case_studies.interviewready.ai_game_engine.game.GameResult;
+import case_studies.interviewready.ai_game_engine.game.GameState;
+
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public class RuleEngine {
 
-    public GameResult getState(Board board) {
-        if (board instanceof TicTacToeBoard) {
-            TicTacToeBoard gameBoard = (TicTacToeBoard) board;
+    public GameState getState(Board board) {
+        if (board instanceof TicTacToeBoard tttBoard) {
+            String firstCharacter = "-";
 
-            for (int r = 0; r < 3; r++) {
-                String firstCharacter = gameBoard.getCell(r, 0);
-                boolean rowComplete = firstCharacter != null;
-                for (int c = 1; c < 3 && rowComplete; c++) {
-                    if (!firstCharacter.equals(gameBoard.getCell(r, c))) {
-                        rowComplete = false;
-                    }
-                }
-                if (rowComplete)
-                    return new GameResult(true, firstCharacter);
-            }
+            GameState rowWin = isVictory(tttBoard::getSymbol);
+            if (rowWin != null) return rowWin;
 
+            GameState colWin = isVictory((i, j) -> tttBoard.getSymbol(j, i));
+            if (colWin != null) return colWin;
 
-            for (int c = 0; c < 3; c++) {
-                String firstCharacter = gameBoard.getCell(0, c);
-                boolean colComplete = firstCharacter != null;
-                for (int r = 1; r < 3  && colComplete; r++) {
-                    if (!firstCharacter.equals(gameBoard.getCell(r, c))) {
-                        colComplete = false;
-                        break;
-                    }
-                }
-                if (colComplete)
-                    return new GameResult(true, firstCharacter);
-            }
-
-            String firstCharacter = gameBoard.getCell(0, 0);
+            firstCharacter = tttBoard.getSymbol(0, 0);
             boolean diagComplete = firstCharacter != null;
             for (int r = 0; r < 3 && diagComplete; r++) {
-                if (!firstCharacter.equals(gameBoard.getCell(r, r))) {
+                if (!firstCharacter.equals(tttBoard.getSymbol(r, r))) {
                     diagComplete = false;
                     break;
                 }
             }
             if (diagComplete)
-                return new GameResult(true, firstCharacter);
+                return new GameState(true, firstCharacter);
 
-            firstCharacter = gameBoard.getCell(0, 2);
+            firstCharacter = tttBoard.getSymbol(0, 2);
             boolean revDiagComplete = firstCharacter != null;
             for (int r = 0; r < 3 && revDiagComplete; r++) {
-                if (!firstCharacter.equals(gameBoard.getCell(r, 2 - r))) {
+                if (!firstCharacter.equals(tttBoard.getSymbol(r, 2 - r))) {
                     revDiagComplete = false;
                     break;
                 }
             }
             if (revDiagComplete)
-                return new GameResult(true, firstCharacter);
+                return new GameState(true, firstCharacter);
 
 
             boolean isGameOver = true;
             for (int r = 0; r < 3 && isGameOver; r++) {
                 for (int c = 0; c < 3; c++) {
-                    if (gameBoard.getCell(r, c) == null) {
+                    if (tttBoard.getSymbol(r, c) == null) {
                         isGameOver = false;
                         break;
                     }
                 }
             }
             if (isGameOver)
-                return new GameResult(true, "-");
+                return new GameState(true, "-");
         }
-        return new GameResult(false, "-");
+        return new GameState(false, "-");
+    }
+
+    public GameState isVictory(BiFunction<Integer, Integer, String> next) {
+        for (int i = 0; i < 3; i++) {
+            boolean possibleStreak = true;
+            for (int j = 0; j < 3; j++) {
+                if (next.apply(i, j) == null || !next.apply(i, 0).equals(next.apply(i, j))) {
+                    possibleStreak = false;
+                    break;
+                }
+            }
+            if (possibleStreak) return new GameState(true, next.apply(i, 0));
+        }
+        return null;
     }
 }

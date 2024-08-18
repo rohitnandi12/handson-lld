@@ -3,8 +3,6 @@ package case_studies.interviewready.ai_game_engine.api;
 import case_studies.interviewready.ai_game_engine.boards.TicTacToeBoard;
 import case_studies.interviewready.ai_game_engine.game.*;
 
-import java.util.Arrays;
-
 public class AIEngine {
 
     RuleEngine ruleEngine = new RuleEngine();
@@ -60,7 +58,7 @@ public class AIEngine {
     public Move getBasicMove(Player player, TicTacToeBoard board) {
         for (int r = 0; r < 3; r++) {
             for (int c = 0; c < 3; c++) {
-                if (board.getCell(r, c) == null) {
+                if (board.getSymbol(r, c) == null) {
                     return new Move(player, new Cell(r, c));
                 }
             }
@@ -73,7 +71,7 @@ public class AIEngine {
         int count = 0;
         for (int r = 0; r < 3; r++) {
             for (int c = 0; c < 3; c++) {
-                if (board.getCell(r, c) == null) {
+                if (board.getSymbol(r, c) == null) {
                     count++;
                 }
             }

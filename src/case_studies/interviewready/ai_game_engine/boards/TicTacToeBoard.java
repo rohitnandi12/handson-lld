@@ -4,8 +4,6 @@ import case_studies.interviewready.ai_game_engine.game.Board;
 import case_studies.interviewready.ai_game_engine.game.Cell;
 import case_studies.interviewready.ai_game_engine.game.Move;
 
-import java.util.Arrays;
-
 public class TicTacToeBoard implements Board {
     private final String[][] cells = new String[3][3];
 
@@ -13,8 +11,8 @@ public class TicTacToeBoard implements Board {
         return cells;
     }
 
-    public String getCell(int row, int col) {
-        return cells[row][col];
+    public String getSymbol(int row, int col) {
+        return this.cells[row][col];
     }
 
     public void setCell(Cell cell, String playerSymbol) {
@@ -48,9 +46,5 @@ public class TicTacToeBoard implements Board {
             System.arraycopy(this.cells[row], 0, newTTTBoard.cells[row], 0, 3);
         }
         return newTTTBoard;
-    }
-
-    public String getSymbol(int r, int c) {
-        return this.cells[r][c];
     }
 }
