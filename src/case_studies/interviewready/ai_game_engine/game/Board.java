@@ -1,6 +1,7 @@
 package case_studies.interviewready.ai_game_engine.game;
 
-public abstract class Board {
+public interface Board {
 
-    public abstract void move(Move move);
+    void move(Move move);
+    Board copy();
 }

@@ -1,7 +1,6 @@
 import case_studies.interviewready.ai_game_engine.api.AIEngine;
 import case_studies.interviewready.ai_game_engine.api.GameEngine;
 import case_studies.interviewready.ai_game_engine.api.RuleEngine;
-import case_studies.interviewready.ai_game_engine.boards.TicTacToeBoard;
 import case_studies.interviewready.ai_game_engine.game.Board;
 import case_studies.interviewready.ai_game_engine.game.Cell;
 import case_studies.interviewready.ai_game_engine.game.Move;
@@ -28,14 +27,18 @@ public class GamePlayTest {
         aiEngine = new AIEngine();
         board = gameEngine.start("TicTacToe");
         playerFactory = new HashMap<>();
-        playerFactory.put("humanX", new Player("X"));
+        playerFactory.put("staticX", new Player("X"));
+        playerFactory.put("staticO", new Player("O"));
         playerFactory.put("computerO", new Player("O"));
     }
 
     @Test
     public void checkForRowWin() {
-        int[][] moves = new int[][]{{1, 0}, {1, 1}, {1, 2}}; // second row
-        String[] playerTypes = new String[]{"humanX", "computerO"};
+        int[][][] moves = new int[][][]{
+                {{1, 0}, {1, 1}, {1, 2}},
+                {{0, 0}, {0, 1}, {0, 2}},
+        };// second row
+        String[] playerTypes = new String[]{"staticX", "staticO"};
 
         playGame(board, moves, playerTypes);
 
@@ -45,8 +48,11 @@ public class GamePlayTest {
 
     @Test
     public void checkForColWin() {
-        int[][] moves = new int[][]{{0, 0}, {1, 0}, {2, 0}};
-        String[] playerTypes = new String[]{"humanX", "computerO"};
+        int[][][] moves = new int[][][]{
+                {{0, 0}, {1, 0}, {2, 0}},
+                {{0, 1}, {1, 1}, {2, 1}},
+        };// second row
+        String[] playerTypes = new String[]{"staticX", "staticO"};
 
         playGame(board, moves, playerTypes);
 
@@ -56,8 +62,11 @@ public class GamePlayTest {
 
     @Test
     public void checkForDiagnolWin() {
-        int[][] moves = new int[][]{{0, 0}, {1, 1}, {2, 2}};
-        String[] playerTypes = new String[]{"humanX", "computerO"};
+        int[][][] moves = new int[][][]{
+                {{0, 0}, {1, 1}, {2, 2}},
+                {{1, 0}, {0, 1}, {1, 2}},
+        };// second row
+        String[] playerTypes = new String[]{"staticX", "staticO"};
 
         playGame(board, moves, playerTypes);
 
@@ -66,9 +75,12 @@ public class GamePlayTest {
     }
 
     @Test
-    public void checkForRevDiagnolWin() {
-        int[][] moves = new int[][]{{0, 2}, {1, 1}, {2, 0}};
-        String[] playerTypes = new String[]{"humanX", "computerO"};
+    public void checkForRevDiagonalWin() {
+        int[][][] moves = new int[][][]{
+                {{0, 2}, {1, 1}, {2, 0}},
+                {{1, 0}, {0, 1}, {1, 2}},
+        };// second row
+        String[] playerTypes = new String[]{"staticX", "staticO"};
 
         playGame(board, moves, playerTypes);
 
@@ -77,9 +89,12 @@ public class GamePlayTest {
     }
 
     @Test
-    public void checkForComputerWin() {
-        int[][] moves = new int[][]{{1, 0}, {1, 1}, {2, 0}};
-        String[] playerTypes = new String[]{"humanX", "computerO"};
+    public void checkForOWin() {
+        int[][][] moves = new int[][][]{
+                {{1, 0}, {1, 1}, {2, 0}},
+                {{0, 0}, {0, 1}, {0, 2}},
+        };// second row
+        String[] playerTypes = new String[]{"staticX", "staticO"};
 
         playGame(board, moves, playerTypes);
 
@@ -89,8 +104,11 @@ public class GamePlayTest {
 
     @Test
     public void checkForDraw() {
-        int[][] moves = new int[][]{{0, 1}, {1, 0}, {1, 2}, {2, 0}, {2, 2}};
-        String[] playerTypes = new String[]{"humanX", "computerO"};
+        int[][][] moves = new int[][][]{
+                {{0, 0}, {0, 2}, {1, 0}, {1, 2},{2,1}},
+                {{0, 1}, {1, 1}, {2, 0}, {2, 2}},
+        };// second row
+        String[] playerTypes = new String[]{"staticX", "staticO"};
 
         playGame(board, moves, playerTypes);
 
@@ -98,23 +116,26 @@ public class GamePlayTest {
         Assert.assertEquals("-", ruleEngine.getState(board).getWinner());
     }
 
-    private void playGame(Board board, int[][] moves, String[] playerTypes) {
+    private void playGame(Board board, int[][][] moves, String[] playerTypes) {
         Player firstPlayer = playerFactory.get(playerTypes[0]);
         Player secondPlayer = playerFactory.get(playerTypes[1]);
-        int row, col, next = 0;
+        int turn = 0;
+        int[][] firstPlayerMoves = moves[0];
+        int[][] secondPlayerMoves = moves[1];
         while (!ruleEngine.getState(board).isOver()) {
-            System.out.println("Make your move!!");
-            System.out.println(board);
-            row = moves[next][0];
-            col = moves[next][1];
-            next += 1;
-            Move firstPlayerMove = new Move(firstPlayer, new Cell(row, col));
-            gameEngine.move(board, firstPlayerMove);
-            System.out.println(board);
-            if (!ruleEngine.getState(board).isOver()) {
-                Move secondPlayerMove = aiEngine.suggestMove(secondPlayer, board);
-                gameEngine.move(board, secondPlayerMove);
-            }
+            playerMove(firstPlayer, turn, firstPlayerMoves);
+            if(!ruleEngine.getState(board).isOver())
+                playerMove(secondPlayer, turn, secondPlayerMoves);
+            turn += 1;
         }
+    }
+
+    private void playerMove(Player player, int turn, int[][] playerMoves) {
+        System.out.println(board);
+        System.out.println(player + "is making move!!");
+        int row = playerMoves[turn][0];
+        int col = playerMoves[turn][1];
+        Move currentPlayerMove = new Move(player, new Cell(row, col));
+        gameEngine.move(board, currentPlayerMove);
     }
 }

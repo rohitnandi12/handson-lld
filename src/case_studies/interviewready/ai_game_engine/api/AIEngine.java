@@ -45,8 +45,9 @@ public class AIEngine {
             for (int c = 0; c < 3; c++) {
                 if (board.getSymbol(r, c) == null) {
                     Move move = new Move(player.flip(), new Cell(r, c));
-                    board.move(move);
-                    if (ruleEngine.getState(board).isOver()) {
+                    TicTacToeBoard boardCopy = board.copy();
+                    boardCopy.move(move);
+                    if (ruleEngine.getState(boardCopy).isOver()) {
                         return new Move(player, new Cell(r, c));
                     }
                 }

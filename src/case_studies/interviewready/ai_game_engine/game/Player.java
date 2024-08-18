@@ -15,4 +15,9 @@ public class Player {
     public Player flip() {
         return new Player(this.symbol().equals("X") ? "O" : "X");
     }
+
+    @Override
+    public String toString() {
+        return "Player-'" + playerSymbol + "' ";
+    }
 }
