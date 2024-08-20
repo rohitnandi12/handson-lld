@@ -66,4 +66,50 @@ public class RuleEngine {
         }
         return result;
     }
+
+    public GameInfo getInfo(Board board) {
+        if (board instanceof TicTacToeBoard tttBoard) {
+            GameState gameState = getState(tttBoard);
+
+            final String[] players = new String[]{"X", "O"};
+            for (int index = 0; index < 2; index++) {
+                for (int r = 0; r < 3; r++) {
+                    for (int c = 0; c < 3; c++) {
+                        Board b = board.copy();
+                        Player player = new Player(players[index]);
+                        Player opponent = player.flip();
+                        b.move(new Move(player, new Cell(r, c)));
+                        boolean canStillWin = false;
+                        for (int k = 0; k < 3; k++) {
+                            for (int l = 0; l < 3; l++) {
+                                Board b1 = board.copy();
+                                b1.move(new Move(opponent, new Cell(k, l)));
+                                if (getState(b1).getWinner().equals(opponent.symbol())) {
+                                    canStillWin = true;
+                                    break;
+                                }
+                            }
+                            if (!canStillWin) break;
+                        }
+                        if (canStillWin) {
+                            return GameInfo.builder()
+                                    .isOver(gameState.isOver())
+                                    .winner(gameState.getWinner())
+                                    .hasFork(true)
+                                    .player(opponent)
+                                    .build();
+                        }
+                    }
+                }
+            }
+            return GameInfo.builder()
+                    .isOver(gameState.isOver())
+                    .winner(gameState.getWinner())
+                    .hasFork(false)
+                    .player(null)
+                    .build();
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
 }
