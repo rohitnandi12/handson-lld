@@ -1,7 +1,10 @@
 package case_studies.interviewready.ai_game_engine.api;
 
 import case_studies.interviewready.ai_game_engine.boards.TicTacToeBoard;
-import case_studies.interviewready.ai_game_engine.game.*;
+import case_studies.interviewready.ai_game_engine.game.Board;
+import case_studies.interviewready.ai_game_engine.game.Cell;
+import case_studies.interviewready.ai_game_engine.game.Move;
+import case_studies.interviewready.ai_game_engine.game.Player;
 
 public class AIEngine {
 
