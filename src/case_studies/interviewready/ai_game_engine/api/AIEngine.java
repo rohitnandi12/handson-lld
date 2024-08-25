@@ -13,7 +13,7 @@ public class AIEngine {
     public Move suggestMove(Player player, Board board) {
         if (board instanceof TicTacToeBoard ticTacToeBoard) {
             Move suggestedMove;
-            if (isStarting(ticTacToeBoard, 4)) {
+            if (isStarting(ticTacToeBoard, 3)) {
                 suggestedMove = getBasicMove(player, ticTacToeBoard);
             } else {
                 suggestedMove = getSmartMove(player, ticTacToeBoard);
@@ -32,9 +32,10 @@ public class AIEngine {
         for (int r = 0; r < 3; r++) {
             for (int c = 0; c < 3; c++) {
                 if (board.getSymbol(r, c) == null) {
+                    TicTacToeBoard boardCopy = board.copy();
                     Move move = new Move(player, new Cell(r, c));
-                    board.move(move);
-                    if (ruleEngine.getState(board).isOver()) {
+                    boardCopy.move(move);
+                    if (ruleEngine.getState(boardCopy).isOver()) {
                         return move;
                     }
                 }
@@ -74,7 +75,7 @@ public class AIEngine {
         int count = 0;
         for (int r = 0; r < 3; r++) {
             for (int c = 0; c < 3; c++) {
-                if (board.getSymbol(r, c) == null) {
+                if (board.getSymbol(r, c) != null) {
                     count++;
                 }
             }
