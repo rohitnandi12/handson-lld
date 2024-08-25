@@ -15,38 +15,18 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class RuleEngine {
+public class RuleEngine<T extends Board> {
 
-    Map<String, List<Rule<TicTacToeBoard>>> ruleMap;
+    Map<String, RuleSet<TicTacToeBoard>> ruleMap;
 
     public RuleEngine() {
-        String key = TicTacToeBoard.class.getName();
         ruleMap = new HashMap<>();
-        ruleMap.put(key, new ArrayList<>());
-        ruleMap.get(key).add(new Rule<>(board -> outerTraversal(board::getSymbol)));
-        ruleMap.get(key).add(new Rule<>(board -> outerTraversal((row, col) -> board.getSymbol(col, row))));
-        ruleMap.get(key).add(new Rule<>(board -> traverse(i -> board.getSymbol(i, i))));
-        ruleMap.get(key).add(new Rule<>(board -> traverse(i -> board.getSymbol(i, 2 - i))));
-        ruleMap.get(key).add(new Rule<>(board -> {
-            boolean isGameOver = true;
-            for (int r = 0; r < 3 && isGameOver; r++) {
-                for (int c = 0; c < 3; c++) {
-                    if (board.getSymbol(r, c) == null) {
-                        isGameOver = false;
-                        break;
-                    }
-                }
-            }
-            if (isGameOver) return new GameState(true, "-");
-            return new GameState(false, "-");
-        }));
-
+        ruleMap.put(TicTacToeBoard.class.getName(), TicTacToeBoard.getRules());
     }
 
     public GameState getState(Board board) {
         if (board instanceof TicTacToeBoard tttBoard) {
-
-            List<Rule<TicTacToeBoard>> rules = ruleMap.get(TicTacToeBoard.class.getName());
+            RuleSet<TicTacToeBoard> rules = ruleMap.get(TicTacToeBoard.class.getName());
             for (Rule<TicTacToeBoard> r : rules) {
                 GameState gameState = r.condition.apply(tttBoard);
                 if (gameState.isOver()) {
@@ -55,36 +35,6 @@ public class RuleEngine {
             }
         }
         return new GameState(false, "-");
-    }
-
-    private Function<TicTacToeBoard, GameState> outerTraversals = (board -> outerTraversal(board::getSymbol));
-
-    public GameState outerTraversal(BiFunction<Integer, Integer, String> next) {
-        GameState result = new GameState(false, "-");
-        for (int i = 0; i < 3; i++) {
-            final int ii = i;
-            GameState traversal = traverse(j -> next.apply(ii, j));
-            if (traversal.isOver()) {
-                result = traversal;
-                break;
-            }
-        }
-        return result;
-    }
-
-    private GameState traverse(Function<Integer, String> traversal) {
-        GameState result = new GameState(false, "-");
-        boolean possibleStreak = true;
-        for (int j = 0; j < 3; j++) {
-            if (traversal.apply(j) == null || !traversal.apply(0).equals(traversal.apply(j))) {
-                possibleStreak = false;
-                break;
-            }
-        }
-        if (possibleStreak) {
-            result = new GameState(true, traversal.apply(0));
-        }
-        return result;
     }
 
     public GameInfo getInfo(Board board) {
