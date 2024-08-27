@@ -2,24 +2,21 @@ package case_studies.interviewready.ai_game_engine.boards;
 
 import case_studies.interviewready.ai_game_engine.api.Rule;
 import case_studies.interviewready.ai_game_engine.api.RuleSet;
-import case_studies.interviewready.ai_game_engine.game.Board;
-import case_studies.interviewready.ai_game_engine.game.Cell;
-import case_studies.interviewready.ai_game_engine.game.GameState;
-import case_studies.interviewready.ai_game_engine.game.Move;
+import case_studies.interviewready.ai_game_engine.game.*;
 
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class TicTacToeBoard implements Board {
+public class TicTacToeBoard implements CellBoard {
     private final String[][] cells = new String[3][3];
 
-    public static RuleSet<TicTacToeBoard> getRules() {
-        RuleSet<TicTacToeBoard> rules = new RuleSet<>();
-        rules.add(new Rule<>(board -> outerTraversal(board::getSymbol)));
-        rules.add(new Rule<>(board -> outerTraversal((row, col) -> board.getSymbol(col, row))));
-        rules.add(new Rule<>(board -> traverse(i -> board.getSymbol(i, i))));
-        rules.add(new Rule<>(board -> traverse(i -> board.getSymbol(i, 2 - i))));
-        rules.add(new Rule<>(board -> {
+    public static RuleSet getRules() {
+        RuleSet rules = new RuleSet();
+        rules.add(new Rule(board -> outerTraversal(board::getSymbol)));
+        rules.add(new Rule(board -> outerTraversal((row, col) -> board.getSymbol(col, row))));
+        rules.add(new Rule(board -> traverse(i -> board.getSymbol(i, i))));
+        rules.add(new Rule(board -> traverse(i -> board.getSymbol(i, 2 - i))));
+        rules.add(new Rule(board -> {
             boolean isGameOver = true;
             for (int r = 0; r < 3 && isGameOver; r++) {
                 for (int c = 0; c < 3; c++) {
