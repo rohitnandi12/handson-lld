@@ -1,10 +1,8 @@
 package case_studies.interviewready.ai_game_engine.api;
 
 import case_studies.interviewready.ai_game_engine.boards.TicTacToeBoard;
-import case_studies.interviewready.ai_game_engine.game.Board;
-import case_studies.interviewready.ai_game_engine.game.Cell;
-import case_studies.interviewready.ai_game_engine.game.Move;
-import case_studies.interviewready.ai_game_engine.game.Player;
+import case_studies.interviewready.ai_game_engine.game.*;
+import case_studies.interviewready.ai_game_engine.placements.*;
 
 public class AIEngine {
 
@@ -12,66 +10,51 @@ public class AIEngine {
 
     public Move suggestMove(Player player, Board board) {
         if (board instanceof TicTacToeBoard ticTacToeBoard) {
-            Move suggestedMove;
-            if (isStarting(ticTacToeBoard, 3)) {
-                suggestedMove = getBasicMove(player, ticTacToeBoard);
-            } else {
-                suggestedMove = getSmartMove(player, ticTacToeBoard);
-            }
+            int threshold = 3;
+            int turnsPassedTillNow = getTurnsPassedTillNow(ticTacToeBoard);
 
-            if (suggestedMove != null)
-                return suggestedMove;
+            Placement placementChain = new BinaryConditionalPlacement(() -> turnsPassedTillNow < threshold)
+                    .setNextOnTrue(new FirstVacantPlacement())
+                    .setNextOnFalse(
+                            new BinaryConditionalPlacement(() -> turnsPassedTillNow < threshold + 1)
+                                    .setNextOnTrue(getSmartPlacementChain())
+                                    .setNextOnFalse(getOptimalMovePlacementChain())
+                    );
 
-            throw new IllegalStateException();
+            Cell suggestedCell =  placementChain.evaluatePlacement(ticTacToeBoard, player)
+                    .orElseThrow(IllegalStateException::new);
+
+            return new Move(player, suggestedCell);
         } else {
             throw new IllegalArgumentException();
         }
     }
 
-    public Move getSmartMove(Player player, TicTacToeBoard board) {
-        for (int r = 0; r < 3; r++) {
-            for (int c = 0; c < 3; c++) {
-                if (board.getSymbol(r, c) == null) {
-                    TicTacToeBoard boardCopy = board.copy();
-                    Move move = new Move(player, new Cell(r, c));
-                    boardCopy.move(move);
-                    if (ruleEngine.getState(boardCopy).isOver()) {
-                        return move;
-                    }
-                }
-            }
-        }
+    private BasePlacement getOptimalMovePlacementChain() {
+        BasePlacement firstLink = new OffensivePlacement(); //1. if you have a winning move, then play it
 
-        // Defensive Moves
-        for (int r = 0; r < 3; r++) {
-            for (int c = 0; c < 3; c++) {
-                if (board.getSymbol(r, c) == null) {
-                    Move move = new Move(player.flip(), new Cell(r, c));
-                    TicTacToeBoard boardCopy = board.copy();
-                    boardCopy.move(move);
-                    if (ruleEngine.getState(boardCopy).isOver()) {
-                        return new Move(player, new Cell(r, c));
-                    }
-                }
-            }
-        }
-
-        return getBasicMove(player, board);
+        firstLink
+                .setNextPlacement(new DefensivePlacement()) //2. if opp have a winning move, then block it
+                .setNextPlacement(new ForkPlacement()) //3. if you have a fork, then play it or 4. if opp have a fork, then block it
+                .setNextPlacement(new CenterPlacement()) //5. if the center is available, take it
+                .setNextPlacement(new CornerPlacement()) //6. if any corner is available take it
+                .setTerminal(new FirstVacantPlacement());
+        return firstLink;
     }
 
-    public Move getBasicMove(Player player, TicTacToeBoard board) {
-        for (int r = 0; r < 3; r++) {
-            for (int c = 0; c < 3; c++) {
-                if (board.getSymbol(r, c) == null) {
-                    return new Move(player, new Cell(r, c));
-                }
-            }
-        }
+    public BasePlacement getSmartPlacementChain() {
 
-        throw new IllegalArgumentException();
+        BasePlacement firstLink = new OffensivePlacement(); //1. if you have a winning move, then play it
+
+        firstLink
+                .setNextPlacement(new DefensivePlacement()) //2. if opp have a winning move, then block it
+                .setNextPlacement(new CenterPlacement())
+                .setTerminal(new FirstVacantPlacement());
+
+        return firstLink;
     }
 
-    public boolean isStarting(TicTacToeBoard board, int threshold) {
+    public int getTurnsPassedTillNow(TicTacToeBoard board) {
         int count = 0;
         for (int r = 0; r < 3; r++) {
             for (int c = 0; c < 3; c++) {
@@ -80,6 +63,6 @@ public class AIEngine {
                 }
             }
         }
-        return count < threshold;
+        return count;
     }
 }

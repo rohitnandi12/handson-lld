@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class RuleEngine<T extends Board> {
+public class RuleEngine {
 
     Map<String, RuleSet<TicTacToeBoard>> ruleMap;
 
@@ -42,6 +42,7 @@ public class RuleEngine<T extends Board> {
             GameState gameState = getState(tttBoard);
 
             final String[] players = new String[]{"X", "O"};
+            Cell forkCell = null;
             for (int index = 0; index < 2; index++) {
                 for (int r = 0; r < 3; r++) {
                     for (int c = 0; c < 3; c++) {
@@ -52,8 +53,9 @@ public class RuleEngine<T extends Board> {
                         boolean canStillWin = false;
                         for (int k = 0; k < 3; k++) {
                             for (int l = 0; l < 3; l++) {
-                                Board b1 = board.copy();
-                                b1.move(new Move(opponent, new Cell(k, l)));
+                                Board b1 = b.copy();
+                                forkCell = new Cell(k, l);
+                                b1.move(new Move(opponent, forkCell));
                                 if (getState(b1).getWinner().equals(opponent.symbol())) {
                                     canStillWin = true;
                                     break;
@@ -66,6 +68,7 @@ public class RuleEngine<T extends Board> {
                                     .isOver(gameState.isOver())
                                     .winner(gameState.getWinner())
                                     .hasFork(true)
+                                    .forkCell(forkCell)
                                     .player(opponent)
                                     .build();
                         }
@@ -76,7 +79,6 @@ public class RuleEngine<T extends Board> {
                     .isOver(gameState.isOver())
                     .winner(gameState.getWinner())
                     .hasFork(false)
-                    .player(null)
                     .build();
         } else {
             throw new IllegalArgumentException();
