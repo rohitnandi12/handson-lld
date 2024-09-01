@@ -117,4 +117,13 @@ public class TicTacToeBoard implements CellBoard {
     public void addToHistory() {
         history.add(new Representation(this));
     }
+
+    public enum Symbol {
+        X("X"), O("0");
+        String marker;
+
+        Symbol(String marker) {
+            this.marker = marker;
+        }
+    }
 }

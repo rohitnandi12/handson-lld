@@ -1,5 +1,7 @@
 package case_studies.interviewready.ai_game_engine.game;
 
+import case_studies.interviewready.ai_game_engine.boards.TicTacToeBoard;
+
 public class Cell {
     private int row;
     private int col;
