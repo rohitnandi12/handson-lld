@@ -18,9 +18,8 @@ public class OffensivePlacement extends BasePlacement {
         for (int r = 0; r < 3; r++) {
             for (int c = 0; c < 3; c++) {
                 if (board.getSymbol(r, c) == null) {
-                    TicTacToeBoard boardCopy = board.copy();
                     Move move = new Move(player, new Cell(r, c));
-                    boardCopy.move(move);
+                    TicTacToeBoard boardCopy = board.move(move);
                     if (this.ruleEngine.getState(boardCopy).isOver()) {
                         return Optional.of(move.getCell());
                     }

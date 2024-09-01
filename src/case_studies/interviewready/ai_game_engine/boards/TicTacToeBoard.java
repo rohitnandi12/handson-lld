@@ -10,6 +10,8 @@ import java.util.function.Function;
 public class TicTacToeBoard implements CellBoard {
     private final String[][] cells = new String[3][3];
 
+    private History history = new History();
+
     public static RuleSet getRules() {
         RuleSet rules = new RuleSet();
         rules.add(new Rule(board -> outerTraversal(board::getSymbol)));
@@ -90,8 +92,11 @@ public class TicTacToeBoard implements CellBoard {
     }
 
     @Override
-    public void move(Move move) {
-        setCell(move.getCell(), move.getPlayer().symbol());
+    public TicTacToeBoard move(Move move) {
+        history.add(new Representation(this));
+        TicTacToeBoard tttBoardCopy = this.copy();
+        tttBoardCopy.setCell(move.getCell(), move.getPlayer().symbol());
+        return tttBoardCopy;
     }
 
     @Override
@@ -100,6 +105,7 @@ public class TicTacToeBoard implements CellBoard {
         for (int row = 0; row < 3; row++) {
             System.arraycopy(this.cells[row], 0, newTTTBoard.cells[row], 0, 3);
         }
+        newTTTBoard.history = this.history;
         return newTTTBoard;
     }
 }

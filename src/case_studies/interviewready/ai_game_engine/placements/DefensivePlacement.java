@@ -19,8 +19,7 @@ public class DefensivePlacement extends BasePlacement {
             for (int c = 0; c < 3; c++) {
                 if (board.getSymbol(r, c) == null) {
                     Move move = new Move(player.flip(), new Cell(r, c));
-                    TicTacToeBoard boardCopy = board.copy();
-                    boardCopy.move(move);
+                    TicTacToeBoard boardCopy = board.move(move);
                     if (ruleEngine.getState(boardCopy).isOver()) {
                         return Optional.of(new Cell(r, c));
                     }
