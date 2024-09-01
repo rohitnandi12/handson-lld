@@ -4,6 +4,7 @@ import case_studies.interviewready.ai_game_engine.api.Rule;
 import case_studies.interviewready.ai_game_engine.api.RuleSet;
 import case_studies.interviewready.ai_game_engine.game.*;
 
+import java.util.Collections;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -11,6 +12,10 @@ public class TicTacToeBoard implements CellBoard {
     private final String[][] cells = new String[3][3];
 
     private History history = new History();
+
+    public History getHistory() {
+        return history;
+    }
 
     public static RuleSet getRules() {
         RuleSet rules = new RuleSet();
@@ -84,7 +89,8 @@ public class TicTacToeBoard implements CellBoard {
         StringBuilder sb = new StringBuilder();
         for (String[] row : this.cells) {
             for (String ele : row) {
-                sb.append(ele + " | ");
+                sb.append((ele == null ? "_" : ele));
+                sb.append(" | ");
             }
             sb.append("\n");
         }
@@ -93,7 +99,6 @@ public class TicTacToeBoard implements CellBoard {
 
     @Override
     public TicTacToeBoard move(Move move) {
-        history.add(new Representation(this));
         TicTacToeBoard tttBoardCopy = this.copy();
         tttBoardCopy.setCell(move.getCell(), move.getPlayer().symbol());
         return tttBoardCopy;
@@ -107,5 +112,9 @@ public class TicTacToeBoard implements CellBoard {
         }
         newTTTBoard.history = this.history;
         return newTTTBoard;
+    }
+
+    public void addToHistory() {
+        history.add(new Representation(this));
     }
 }

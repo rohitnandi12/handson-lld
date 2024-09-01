@@ -3,6 +3,7 @@ package case_studies.interviewready.ai_game_engine;
 import case_studies.interviewready.ai_game_engine.api.AIEngine;
 import case_studies.interviewready.ai_game_engine.api.GameEngine;
 import case_studies.interviewready.ai_game_engine.api.RuleEngine;
+import case_studies.interviewready.ai_game_engine.boards.TicTacToeBoard;
 import case_studies.interviewready.ai_game_engine.game.*;
 
 import java.util.Scanner;
@@ -25,14 +26,15 @@ public class Main {
             System.out.print("Enter col :");
             int col = sc.nextInt();
             Move humanMove = new Move(human, new Cell(row, col));
-            gameEngine.move(board, humanMove);
+            board = gameEngine.move(board, humanMove);
             System.out.println(board);
             if(!ruleEngine.getState(board).isOver()) {
                 Move computerMove = aiEngine.suggestMove(computer, board);
-                gameEngine.move(board, computerMove);
+                board = gameEngine.move(board, computerMove);
             }
         }
 
         System.out.println("GameResult: " + ruleEngine.getState(board));
+        ((TicTacToeBoard)board).getHistory().printHistory();
     }
 }

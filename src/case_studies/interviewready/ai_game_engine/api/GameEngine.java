@@ -8,19 +8,21 @@ public class GameEngine {
     public Board start(String gameType) {
 
         if (gameType.equals("TicTacToe")) {
-            return new TicTacToeBoard();
+            TicTacToeBoard board = new TicTacToeBoard();
+            board.addToHistory();
+            return board;
         } else {
             throw new IllegalArgumentException();
         }
     }
 
     public Board move(Board board, Move move) {
-        if (board instanceof TicTacToeBoard) {
-            board.move(move);
-        } else {
-            throw new IllegalArgumentException();
+        if (board instanceof TicTacToeBoard ticTacToeBoard) {
+            TicTacToeBoard newBoard = ticTacToeBoard.move(move);
+            newBoard.addToHistory();
+            return newBoard;
         }
-        return board;
+        throw new IllegalArgumentException();
     }
 }
 

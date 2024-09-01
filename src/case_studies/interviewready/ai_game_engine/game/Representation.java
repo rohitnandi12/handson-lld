@@ -13,4 +13,9 @@ public class Representation {
     public String getRepresentation() {
         return representation;
     }
+
+    @Override
+    public String toString() {
+        return "Representation\n" + representation;
+    }
 }

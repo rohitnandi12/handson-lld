@@ -1,6 +1,7 @@
 package case_studies.interviewready.ai_game_engine.game;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class History {
@@ -23,4 +24,14 @@ public class History {
         boards.add(representation);
     }
 
+    public void copy(History history) {
+        this.boards = new ArrayList<>(Collections.nCopies(history.boards.size(), null));
+        Collections.copy(this.boards, history.boards);
+    }
+
+    public void printHistory() {
+        System.out.println("==================PRINTING HISTORIES================");
+        this.boards.forEach(System.out::println);
+        System.out.println("====================================================");
+    }
 }
