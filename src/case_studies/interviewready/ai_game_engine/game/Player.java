@@ -1,5 +1,8 @@
 package case_studies.interviewready.ai_game_engine.game;
 
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
+
 public class Player {
 
     private User user;
@@ -7,6 +10,7 @@ public class Player {
     private int timeUsedInMillis;
 
     public Player(String playerSymbol) {
+        this.user = new User(playerSymbol.charAt(0));
         this.playerSymbol = playerSymbol;
     }
 
