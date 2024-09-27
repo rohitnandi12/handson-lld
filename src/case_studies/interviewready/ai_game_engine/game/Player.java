@@ -31,11 +31,11 @@ public class Player {
         return "Player-'" + playerSymbol + "' ";
     }
 
-    public void setTimeTaken(int timeInMillis) {
+    public void setTimeTaken(long timeInMillis) {
         timeUsedInMillis += timeInMillis;
     }
 
-    public int getTimeUsedInMillis() {
+    public long getTimeUsedInMillis() {
         return this.timeUsedInMillis;
     }
 }

@@ -6,7 +6,7 @@ public class Game {
     private Board board;
     private Player winner;
 
-    private int lastMoveTimeInMillis;
+    private long lastMoveTimeInMillis;
     private Integer maxTimePerMove;
     private Integer maxTimePerPlayer;
 
@@ -21,25 +21,34 @@ public class Game {
         this.maxTimePerPlayer = maxTimePerPlayer;
     }
 
-    public void move(Move move, int timeStampInMillis) {
-        int timeTakenSinceLastMove = timeStampInMillis - lastMoveTimeInMillis;
+    public void move(Move move, long timeStampInMillis) {
+        long timeTakenSinceLastMove = timeStampInMillis - lastMoveTimeInMillis;
         move.getPlayer().setTimeTaken(timeTakenSinceLastMove);
         if (gameConfig.isTimed()) {
             moveForTimedGame(move, timeStampInMillis);
         } else {
-            board.move(move);
+            board = board.move(move);
         }
         lastMoveTimeInMillis = timeStampInMillis;
     }
 
-    private void moveForTimedGame(Move move, int timeTakenSinceLastMove) {
-        boolean isTimePerMoveGameConfig = gameConfig.getTimePerMove() != null;
-        int currentTime = isTimePerMoveGameConfig ? timeTakenSinceLastMove : move.getPlayer().getTimeUsedInMillis();
-        int endTime = isTimePerMoveGameConfig ? maxTimePerMove : maxTimePerPlayer;
-        if (currentTime < endTime) {
-            board.move(move);
+    private void moveForTimedGame(Move move, long timeTakenSinceLastMove) {
+        if(gameConfig.isTimed()) {
+            setMoveOrWinner(timeTakenSinceLastMove, maxTimePerMove, move);
+        }
+        setMoveOrWinner(move.getPlayer().getTimeUsedInMillis(), maxTimePerPlayer, move);
+    }
+
+    private void setMoveOrWinner(long timeTakenSinceLastMove, Integer maxTime, Move move) {
+        boolean isTimePerMoveGameConfig = gameConfig.isTimed();
+        if (timeTakenSinceLastMove < maxTime) {
+            board = board.move(move);
         } else {
             winner = move.getPlayer().flip();
         }
+    }
+
+    public Player getWinner() {
+        return winner;
     }
 }
