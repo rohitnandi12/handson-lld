@@ -7,13 +7,24 @@ public class Game {
     private Player winner;
 
     private int lastMoveTimeInMillis;
-    private int maxTimePerMove;
-    private int maxTimePerPlayer;
+    private Integer maxTimePerMove;
+    private Integer maxTimePerPlayer;
+
+    public Game(GameConfig gameConfig, Board board, Player winner,
+                Integer lastMoveTimeInMillis, Integer maxTimePerMove, Integer maxTimePerPlayer
+    ) {
+        this.gameConfig = gameConfig;
+        this.board = board;
+        this.winner = winner;
+        this.lastMoveTimeInMillis = lastMoveTimeInMillis;
+        this.maxTimePerMove = maxTimePerMove;
+        this.maxTimePerPlayer = maxTimePerPlayer;
+    }
 
     public void move(Move move, int timeStampInMillis) {
         int timeTakenSinceLastMove = timeStampInMillis - lastMoveTimeInMillis;
         move.getPlayer().setTimeTaken(timeTakenSinceLastMove);
-        if(gameConfig.isTimed()) {
+        if (gameConfig.isTimed()) {
             moveForTimedGame(move, timeStampInMillis);
         } else {
             board.move(move);
@@ -22,26 +33,13 @@ public class Game {
     }
 
     private void moveForTimedGame(Move move, int timeTakenSinceLastMove) {
-        if(gameConfig.getTimePerMove() != null) {
-            if (moveMadeInTime(timeTakenSinceLastMove)) {
-                board.move(move);
-            } else {
-                winner = move.getPlayer().flip();
-            }
+        boolean isTimePerMoveGameConfig = gameConfig.getTimePerMove() != null;
+        int currentTime = isTimePerMoveGameConfig ? timeTakenSinceLastMove : move.getPlayer().getTimeUsedInMillis();
+        int endTime = isTimePerMoveGameConfig ? maxTimePerMove : maxTimePerPlayer;
+        if (currentTime < endTime) {
+            board.move(move);
         } else {
-            if(moveMadeInTime(move.getPlayer())) {
-                board.move(move);
-            } else {
-                winner = move.getPlayer().flip();
-            }
+            winner = move.getPlayer().flip();
         }
-    }
-
-    private boolean moveMadeInTime(int timeTakenSinceLastMove) {
-        return timeTakenSinceLastMove < maxTimePerMove;
-    }
-
-    private boolean moveMadeInTime(Player player) {
-        return player.getTimeUsedInMillis() < maxTimePerPlayer;
     }
 }

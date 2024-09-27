@@ -1,3 +1,5 @@
+package case_studies.interviewready.ai_game_engine;
+
 import case_studies.interviewready.ai_game_engine.api.AIEngine;
 import case_studies.interviewready.ai_game_engine.api.GameEngine;
 import case_studies.interviewready.ai_game_engine.api.RuleEngine;

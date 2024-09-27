@@ -4,6 +4,11 @@ public class GameConfig {
     private boolean isTimed;
     private Integer timePerMove;
 
+    public GameConfig(Integer timePerMove) {
+        this.isTimed = timePerMove != null;
+        this.timePerMove = timePerMove;
+    }
+
     public boolean isTimed() {
         return isTimed;
     }
